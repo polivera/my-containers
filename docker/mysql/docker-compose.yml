@@ -1,5 +1,4 @@
-version: '3.8'
-
+# Homelab dev mysql
 services:
   mysql:
     image: mysql:8.0
@@ -7,6 +6,8 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: helthcheckuser
+      MYSQL_PASSWORD: helthcheckuserpassword
       TZ: UTC
     ports:
       - "3306:3306"
@@ -18,7 +19,7 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --max_connections=250
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "helthcheckuser", "-phelthcheckuserpassword"]
       interval: 10s
       timeout: 5s
       retries: 5
