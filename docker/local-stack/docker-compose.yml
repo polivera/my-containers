@@ -3,8 +3,8 @@ services:
     container_name: localstack
     image: localstack/localstack
     ports:
-      - "127.0.0.1:4566:4566"
-      - "127.0.0.1:4510-4559:4510-4559"
+      - "4566:4566"
+      - "4510-4559:4510-4559"
     environment:
       - DEBUG=${DEBUG:-0}
     volumes:
