@@ -1,0 +1,13 @@
+# resource-quota.yaml - Limits the resources that can be used in a namespace
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: mem-cpu-quota
+  namespace: app-namespace # The namespace to apply the quota to
+spec:
+  hard:
+    requests.cpu: "1" # Maximum total CPU requests allowed in this namespace
+    requests.memory: 1.5Gi # Maximum total memory requests allowed in this namespace
+    limits.cpu: "1.5" # Maximum total CPU limits allowed in this namespace
+    limits.memory: 2Gi # Maximum total memory limits allowed in this namespace

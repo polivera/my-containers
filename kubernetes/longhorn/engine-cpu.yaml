@@ -1,0 +1,32 @@
+# guaranteed-engine-cpu.yaml - Ensures Longhorn engines get minimum CPU resources
+
+apiVersion: longhorn.io/v1beta1
+kind: Setting
+metadata:
+  name: guaranteed-engine-cpu
+  namespace: longhorn-system
+value:
+  "0.15" # Guarantees 0.15 CPU cores (15% of a core) for each volume engine
+  # This is critical as engines need consistent CPU to avoid I/O stalls
+
+
+# CPU guarantee for engine manager
+
+apiVersion: longhorn.io/v1beta1
+kind: Setting
+metadata:
+  name: guaranteed-engine-manager-cpu
+  namespace: longhorn-system
+value: "0.1"                       # Guarantees 0.1 CPU cores (10% of a core) for each engine manager
+                                   # Engine managers coordinate volume operations on each node
+
+# CPU guarantee for replica manager
+
+apiVersion: longhorn.io/v1beta1
+kind: Setting
+metadata:
+  name: guaranteed-replica-manager-cpu
+  namespace: longhorn-system
+value: "0.1"                       # Guarantees 0.1 CPU cores (10% of a core) for each replica manager
+                                   # Replica managers handle volume data synchronization
+

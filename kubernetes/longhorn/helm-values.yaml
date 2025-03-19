@@ -1,0 +1,40 @@
+# helm-values.yaml - Configuration values for Longhorn Helm installation
+
+persistence:
+  defaultClass: true # Makes Longhorn the default storage class in the cluster
+  defaultClassReplicaCount: 2 # Sets 2 replicas by default - good balance of redundancy and resource usage for 3 nodes
+
+csi:
+  kubeletRootDir: /var/lib/kubelet # Path to kubelet directory, usually doesn't need to be changed
+  attacherReplicaCount: 1 # Reduces CSI attacher replicas to save resources (default is 3)
+  provisionerReplicaCount: 1 # Reduces CSI provisioner replicas to save resources (default is 3)
+  resizerReplicaCount: 1 # Reduces CSI resizer replicas to save resources (default is 3)
+  snapshotter:
+    enabled: false # Disables snapshot functionality to save resources
+
+longhornManager:
+  priorityClass: "" # No specific priority class for manager pods
+  tolerations: [] # No special tolerations - manager runs on all nodes
+  resources:
+    limits: # Resource limits - how much CPU/RAM a pod can use at maximum
+      cpu: 250m # Limits CPU to 250 millicores (1/4 of a CPU core)
+      memory: 200Mi # Limits memory to 200 MB
+    requests: # Resource requests - how much CPU/RAM to reserve for the pod
+      cpu: 100m # Reserves 100 millicores (1/10 of a CPU core)
+      memory: 100Mi # Reserves 100 MB of memory
+
+longhornUI:
+  replicas: 1 # Run only 1 replica of the UI to save resources (default is 2)
+  resources:
+    limits: # Resource limits for the UI component
+      cpu: 100m # Limits CPU to 100 millicores (1/10 of a CPU core)
+      memory: 200Mi # Limits memory to 200 MB
+    requests: # Resource requests for the UI component
+      cpu: 50m # Reserves 50 millicores (1/20 of a CPU core)
+      memory: 100Mi # Reserves 100 MB of memory
+
+longhornDriver:
+  priorityClass: "" # No specific priority class for driver pods
+  tolerations: [] # No special tolerations - driver runs on all nodes
+  nodeSelector: {} # No node selection - driver runs on all nodes
+
