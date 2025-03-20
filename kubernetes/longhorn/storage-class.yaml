@@ -1,21 +1,14 @@
 # storage-class.yaml - Defines a storage class optimized for database workloads
 
-apiVersion: v1
-kind: ConfigMap
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: longhorn-storageclass
-  namespace: longhorn-system
-data:
-  storageclass.yaml: |
-    kind: StorageClass
-    apiVersion: storage.k8s.io/v1
-    metadata:
-      name: longhorn-db-optimized      # Name of the storage class
-    provisioner: driver.longhorn.io    # Uses the Longhorn provisioner
-    allowVolumeExpansion: true         # Allows volumes to be expanded later if needed
-    parameters:
-      numberOfReplicas: "2"            # Creates 2 replicas for data redundancy while saving resources
-      staleReplicaTimeout: "30"        # Time in minutes before considering a replica stale
-      fromBackup: ""                   # No backup to restore from
-      fsType: "ext4"                   # Uses ext4 filesystem (good balance of performance and reliability)
-      dataLocality: "best-effort"      # Tries to keep a replica on the same node as the workload for better performance
+  name: longhorn-default
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "30"
+  fromBackup: ""
+  fsType: "ext4"
+  dataLocality: "best-effort"
