@@ -4,8 +4,17 @@ kind: Namespace
 metadata:
   name: pihole
 ---
+# pihole-secret.yaml - Use a Secret instead of ConfigMap for passwords
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pihole-secret
+  namespace: pihole
+type: Opaque
+stringData:
+  WEBPASSWORD: "my-secret-password" # Replace with your password
+---
 # pihole-configmap.yaml
-# TODO: This section is not working, should fix
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -15,9 +24,11 @@ data:
   DNS1: "1.1.1.1"
   DNS2: "9.9.9.9"
   TZ: "Europe/Madrid"
-  WEBPASSWORD: "my secret password" # Replace with your password
   VIRTUAL_HOST: "pi.hole"
   ServerIP: "0.0.0.0"
+  DNSMASQ_LISTENING: "all"
+  FTLCONF_LOCAL_IPV4: "0.0.0.0"
+  FTLCONF_MAXDBDAYS: "7" # Reduce database retention to save space
 ---
 # pihole-pvc.yaml
 apiVersion: v1
@@ -67,18 +78,21 @@ spec:
     spec:
       containers:
         - name: pihole
-          image: pihole/pihole:latest
+          image: pihole/pihole:2025.03.0 # Specify exact version for stability
           resources:
             limits:
-              cpu: 1000m
-              memory: 512Mi
+              cpu: 500m # Reduced from 1000m
+              memory: 300Mi # Reduced from 512Mi
             requests:
-              cpu: 200m
-              memory: 256Mi
+              cpu: 100m # Reduced from 200m
+              memory: 200Mi # Reduced from 256Mi
           securityContext:
             capabilities:
               add:
-                - SYS_TIME
+                - NET_ADMIN # Required for DNS
+                - NET_BIND_SERVICE # Required to bind to ports < 1024
+                - SYS_NICE # For process priority
+                - SYS_TIME # For NTP functionality
                 - CAP_SYS_NICE
           env:
             - name: DNS1
@@ -98,8 +112,8 @@ spec:
                   key: TZ
             - name: WEBPASSWORD
               valueFrom:
-                configMapKeyRef:
-                  name: pihole-config
+                secretKeyRef:
+                  name: pihole-secret
                   key: WEBPASSWORD
             - name: VIRTUAL_HOST
               valueFrom:
@@ -111,6 +125,21 @@ spec:
                 configMapKeyRef:
                   name: pihole-config
                   key: ServerIP
+            - name: DNSMASQ_LISTENING
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: DNSMASQ_LISTENING
+            - name: FTLCONF_LOCAL_IPV4
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: FTLCONF_LOCAL_IPV4
+            - name: FTLCONF_MAXDBDAYS
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: FTLCONF_MAXDBDAYS
           ports:
             - containerPort: 80
               name: http
@@ -126,17 +155,32 @@ spec:
             - name: pihole-dnsmasq
               mountPath: /etc/dnsmasq.d
           readinessProbe:
-            httpGet:
-              path: /admin/login
-              port: 80
+            tcpSocket: # Use TCP socket check instead of HTTP
+              port: 53
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 53
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe: # Add startup probe to give container time to start
+            tcpSocket:
+              port: 53
             initialDelaySeconds: 10
             periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /admin/login
-              port: 80
-            initialDelaySeconds: 60
-            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 12 # 120 seconds (12 * 10s) to start up
+      terminationGracePeriodSeconds: 60
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       volumes:
         - name: pihole-data
           persistentVolumeClaim:
