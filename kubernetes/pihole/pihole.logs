@@ -1,0 +1,79 @@
+  [i] Setting up user & group for the pihole user
+  [i] PIHOLE_UID not set in environment, using default (1000)
+  [i] PIHOLE_GID not set in environment, using default (1000)
+
+  [i] Starting FTL configuration
+  [i] Password already set in config file
+  [i] Starting crond for scheduled scripts. Randomizing times for gravity and update checker
+
+  [i] Ensuring logrotate script exists in /etc/pihole
+
+  [i] Gravity migration checks
+  [i] Existing gravity database found - schema will be upgraded if necessary
+     
+
+  [i] pihole-FTL pre-start checks
+  [i] Setting capabilities on pihole-FTL where possible
+  [i] Applying the following caps to pihole-FTL:
+        * CAP_CHOWN
+        * CAP_NET_BIND_SERVICE
+        * CAP_NET_RAW
+        * CAP_SYS_TIME
+
+  [i] Starting pihole-FTL (no-daemon) as pihole
+
+  [i] Version info:
+      Core version is v6.0.5 (Latest: v6.0.5)
+      Web version is v6.0.2 (Latest: v6.0.2)
+      FTL version is v6.0.4 (Latest: v6.0.4)
+
+2025-03-21 01:02:13.730 CET [52M] INFO: ########## FTL started on pihole-6d9574ddbc-77rv4! ##########
+2025-03-21 01:02:13.730 CET [52M] INFO: FTL branch: master
+2025-03-21 01:02:13.730 CET [52M] INFO: FTL version: v6.0.4
+2025-03-21 01:02:13.730 CET [52M] INFO: FTL commit: b7eb53bf
+2025-03-21 01:02:13.730 CET [52M] INFO: FTL date: 2025-03-04 17:22:10 +0000
+2025-03-21 01:02:13.730 CET [52M] INFO: FTL user: pihole
+2025-03-21 01:02:13.730 CET [52M] INFO: Compiled for linux/amd64 (compiled on CI) using cc (Alpine 14.2.0) 14.2.0
+2025-03-21 01:02:13.732 CET [52M] INFO: Wrote config file:
+2025-03-21 01:02:13.732 CET [52M] INFO:  - 153 total entries
+2025-03-21 01:02:13.733 CET [52M] INFO:  - 150 entries are default
+2025-03-21 01:02:13.733 CET [52M] INFO:  - 3 entries are modified
+2025-03-21 01:02:13.733 CET [52M] INFO:  - 0 entries are forced through environment
+2025-03-21 01:02:13.733 CET [52M] INFO: Parsed config file /etc/pihole/pihole.toml successfully
+2025-03-21 01:02:13.734 CET [52M] INFO: PID file does not exist or not readable
+2025-03-21 01:02:13.734 CET [52M] INFO: No other running FTL process found.
+2025-03-21 01:02:13.734 CET [52M] WARNING: Insufficient permissions to set process priority to -10 (CAP_SYS_NICE required), process priority remains at 0
+2025-03-21 01:02:13.735 CET [52M] INFO: PID of FTL process: 52
+2025-03-21 01:02:13.736 CET [52M] INFO: listening on 0.0.0.0 port 53
+2025-03-21 01:02:13.736 CET [52M] INFO: listening on :: port 53
+2025-03-21 01:02:13.737 CET [52M] INFO: PID of FTL process: 52
+2025-03-21 01:02:13.821 CET [52M] INFO: Database version is 21
+2025-03-21 01:02:13.821 CET [52M] INFO: Database successfully initialized
+2025-03-21 01:02:13.824 CET [52M] INFO: Imported 0 queries from the on-disk database (it has 0 rows)
+2025-03-21 01:02:13.824 CET [52M] INFO: Parsing queries in database
+2025-03-21 01:02:13.824 CET [52M] INFO: Imported 0 queries from the long-term database
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Total DNS queries: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Cached DNS queries: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Forwarded DNS queries: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Blocked DNS queries: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Unknown DNS queries: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Unique domains: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Unique clients: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> DNS cache records: 0
+2025-03-21 01:02:13.824 CET [52M] INFO:  -> Known forward destinations: 0
+2025-03-21 01:02:14.422 CET [52M] INFO: FTL is running as user pihole (UID 1000)
+2025-03-21 01:02:14.422 CET [52M] INFO: Reading certificate from /etc/pihole/tls.pem ...
+2025-03-21 01:02:14.422 CET [52M] INFO: Using SSL/TLS certificate file /etc/pihole/tls.pem
+2025-03-21 01:02:14.422 CET [52M] INFO: Web server ports:
+2025-03-21 01:02:14.422 CET [52M] INFO:   - 0.0.0.0:80 (HTTP, IPv4, optional, OK)
+2025-03-21 01:02:14.422 CET [52M] INFO:   - 0.0.0.0:443 (HTTPS, IPv4, optional, OK)
+2025-03-21 01:02:14.422 CET [52M] INFO:   - [::]:80 (HTTP, IPv6, optional, OK)
+2025-03-21 01:02:14.422 CET [52M] INFO:   - [::]:443 (HTTPS, IPv6, optional, OK)
+2025-03-21 01:02:14.422 CET [52M] INFO: Restored 0 API sessions from the database
+2025-03-21 01:02:14.433 CET [52M] INFO: Blocking status is enabled
+2025-03-21 01:02:14.524 CET [52/T63] INFO: Compiled 0 allow and 0 deny regex for 0 client in 0.1 msec
+2025-03-21 01:02:18.623 CET [52/T61] INFO: Received 8/8 valid NTP replies from pool.ntp.org
+2025-03-21 01:02:18.624 CET [52/T61] INFO: Time offset: -6.278242e+00 ms (excluded 1 outliers)
+2025-03-21 01:02:18.624 CET [52/T61] INFO: Round-trip delay: 1.277815e+01 ms (excluded 1 outliers)
+2025-03-21 01:02:18.624 CET [52/T175] INFO: NTP server listening on :::123 (IPv6)
+2025-03-21 01:02:18.624 CET [52/T174] INFO: NTP server listening on 0.0.0.0:123 (IPv4)

@@ -1,0 +1,185 @@
+# pihole-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pihole
+---
+# pihole-configmap.yaml
+# TODO: This section is not working, should fix
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-config
+  namespace: pihole
+data:
+  DNS1: "1.1.1.1"
+  DNS2: "9.9.9.9"
+  TZ: "Europe/Madrid"
+  WEBPASSWORD: "my secret password" # Replace with your password
+  VIRTUAL_HOST: "pi.hole"
+  ServerIP: "0.0.0.0"
+---
+# pihole-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-data
+  namespace: pihole
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 500Mi
+---
+# pihole-dnsmasq-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-dnsmasq
+  namespace: pihole
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 100Mi
+---
+# pihole-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  namespace: pihole
+  labels:
+    app: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      containers:
+        - name: pihole
+          image: pihole/pihole:latest
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            capabilities:
+              add:
+                - SYS_TIME
+                - CAP_SYS_NICE
+          env:
+            - name: DNS1
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: DNS1
+            - name: DNS2
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: DNS2
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: TZ
+            - name: WEBPASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: WEBPASSWORD
+            - name: VIRTUAL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: VIRTUAL_HOST
+            - name: ServerIP
+              valueFrom:
+                configMapKeyRef:
+                  name: pihole-config
+                  key: ServerIP
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+          volumeMounts:
+            - name: pihole-data
+              mountPath: /etc/pihole
+            - name: pihole-dnsmasq
+              mountPath: /etc/dnsmasq.d
+          readinessProbe:
+            httpGet:
+              path: /admin/login
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /admin/index.php
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+      volumes:
+        - name: pihole-data
+          persistentVolumeClaim:
+            claimName: pihole-data
+        - name: pihole-dnsmasq
+          persistentVolumeClaim:
+            claimName: pihole-dnsmasq
+---
+# pihole-service-tcp.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-tcp
+  namespace: pihole
+  annotations:
+    metallb.universe.tf/allow-shared-ip: pihole
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http
+    - port: 53
+      targetPort: 53
+      name: dns-tcp
+      protocol: TCP
+  selector:
+    app: pihole
+---
+# pihole-service-udp.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-udp
+  namespace: pihole
+  annotations:
+    metallb.universe.tf/allow-shared-ip: pihole
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 53
+      targetPort: 53
+      name: dns-udp
+      protocol: UDP
+  selector:
+    app: pihole
